@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox
 import subprocess
+import os
 
 class PersonalFinance:
     def __init__(self, root):
@@ -20,14 +21,14 @@ class PersonalFinance:
         transaction_record_button.grid(row=1, column=1, padx=10, pady=10)
 
     def launch_interest_calculator(self):
-        interest_calculator_path = r"C:\Users\eesha\Desktop\Peronsal Finance\Interest Calculator.py"
+        interest_calculator_path = os.path.join(os.path.dirname(__file__), "Interest Calculator.py")
         try:
             subprocess.run(["python", interest_calculator_path], check=True)
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"Failed to launch Interest Calculator: {e}")
 
     def launch_transaction_record(self):
-        transaction_record_path = r"C:\Users\eesha\Desktop\Peronsal Finance\Transaction Record.py"
+        transaction_record_path = os.path.join(os.path.dirname(__file__), "Transaction Record.py")
         try:
             subprocess.run(["python", transaction_record_path], check=True)
         except subprocess.CalledProcessError as e:
