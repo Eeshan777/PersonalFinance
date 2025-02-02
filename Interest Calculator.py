@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 from datetime import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 class InterestCalculator:
     def __init__(self, root):
@@ -43,7 +45,11 @@ class InterestCalculator:
 
         # Create and place the delete button
         delete_button = tk.Button(root, text="Delete Entry", command=self.delete_entry)
-        delete_button.grid(row=6, columnspan=2, pady=10)
+        delete_button.grid(row=6, columnspan=3, pady=10)
+
+        # Create and place the save as PDF button
+        save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf)
+        save_pdf_button.grid(row=7, columnspan=3, pady=10)
 
         # Set focus to the first entry field
         self.date_entry.focus()
@@ -161,6 +167,44 @@ class InterestCalculator:
             self.result_table.delete(selected_item)
         else:
             messagebox.showwarning("Selection Error", "Please select an entry to delete.")
+
+    def save_as_pdf(self):
+        """Save the current entries as a PDF."""
+        if not self.entries:
+            messagebox.showwarning("No Entries", "There are no entries to save.")
+            return
+
+        filename = "interest_calculator_report.pdf"
+        c = canvas.Canvas(filename, pagesize=letter)
+        width, height = letter
+
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(100, height - 50, "Interest Calculator Report")
+        c.setFont("Helvetica", 12)
+
+        # Table headers
+        headers = ["Deposit Date", "Maturity Date", "Amount Deposited", "Interest Rate", "Time of Maturity", "Maturity Amount"]
+        x_offset = 50
+        y_offset = height - 100
+
+        for header in headers:
+            c.drawString(x_offset, y_offset, header)
+            x_offset += 100  # Adjust spacing as needed
+
+        y_offset -= 20  # Move down for the data rows
+
+        # Data rows
+        for entry in self.entries:
+            c.drawString(50, y_offset, entry['deposit_date'].strftime("%d/%m/%Y"))
+            c.drawString(150, y_offset, entry['maturity_date'].strftime("%d/%m/%Y"))
+            c.drawString(250, y_offset, str(entry['amount']))
+            c.drawString(350, y_offset, str(entry['interest_rate']))
+            c.drawString(450, y_offset, str(entry['time_of_maturity']))
+            c.drawString(550, y_offset, str(entry['maturity_amount']))
+            y_offset -= 20  # Move down for the next row
+
+        c.save()
+        messagebox.showinfo("Success", f"PDF saved as {filename}")
 
 def run_app():
     """Function to run the application."""

@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 from datetime import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 class TransactionRecord:
     def __init__(self, root):
@@ -38,7 +40,11 @@ class TransactionRecord:
 
         # Delete Entry Button
         self.delete_button = tk.Button(root, text="Delete Entry", command=self.delete_entry)
-        self.delete_button.grid(row=4, column=2, padx=10, pady=5)
+        self.delete_button.grid(row=6, columnspan=3, pady=10)
+
+        # Save as PDF Button
+        self.save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf)
+        self.save_pdf_button.grid(row=7, columnspan=3, pady=10)
 
         # Treeview
         self.tree = ttk.Treeview(root, columns=("Date", "Particular", "Income", "Expenditure", "Balance"), show='headings')
@@ -135,6 +141,52 @@ class TransactionRecord:
             # Format date back to string for display
             date_str = entry['date'].strftime("%d/%m/%Y")
             self.tree.insert("", tk.END, values=(date_str, entry['particular'], income_value, expenditure_value, balance))
+
+    def save_as_pdf(self):
+        """Save the current entries as a PDF."""
+        if not self.entries:
+            messagebox.showwarning("No Entries", "There are no entries to save.")
+            return
+
+        filename = "transaction_record_report.pdf"
+        c = canvas.Canvas(filename, pagesize=letter)
+        width, height = letter
+
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(100, height - 50, "Transaction Record Report")
+        c.setFont("Helvetica", 12)
+
+        # Table headers
+        headers = ["Date", "Particular", "Income", "Expenditure", "Balance"]
+        x_offset = 50
+        y_offset = height - 100
+
+        for header in headers:
+            c.drawString(x_offset, y_offset, header)
+            x_offset += 100  # Adjust spacing as needed
+
+        y_offset -= 20  # Move down for the data rows
+
+        # Data rows
+        balance = 0  # Initialize balance
+        for entry in sorted(self.entries, key=lambda x: x['date']):
+            income_value = entry['amount'] if entry['type'] == "Income" else ""
+            expenditure_value = entry['amount'] if entry['type'] == "Expense" else ""
+            if entry['type'] == "Income":
+                balance += entry['amount']
+            else:
+                balance -= entry['amount']
+            # Format date back to string for display
+            date_str = entry['date'].strftime("%d/%m/%Y")
+            c.drawString(50, y_offset, date_str)
+            c.drawString(150, y_offset, entry['particular'])
+            c.drawString(250, y_offset, str(income_value))
+            c.drawString(350, y_offset, str(expenditure_value))
+            c.drawString(450, y_offset, str(balance))
+            y_offset -= 20  # Move down for the next row
+
+        c.save()
+        messagebox.showinfo("Success", f"PDF saved as {filename}")
 
 def run_app():
     """Function to run the application."""

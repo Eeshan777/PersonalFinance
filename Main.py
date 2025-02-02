@@ -6,7 +6,7 @@ import os
 class PersonalFinance:
     def __init__(self, root):
         self.root = root
-        self.root.title("Main Application")
+        self.root.title("Personal Finance")
 
         # Welcome message
         welcome_label = tk.Label(root, text="Welcome, User!", font=("Helvetica", 24))
@@ -21,14 +21,14 @@ class PersonalFinance:
         transaction_record_button.grid(row=1, column=1, padx=10, pady=10)
 
     def launch_interest_calculator(self):
-        interest_calculator_path = os.path.join(os.path.dirname(__file__), "Interest Calculator.py")
+        interest_calculator_path = os.path.join(os.path.dirname(__file__), "Interest Calculator.py")  # Ensure the filename matches
         try:
             subprocess.run(["python", interest_calculator_path], check=True)
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"Failed to launch Interest Calculator: {e}")
 
     def launch_transaction_record(self):
-        transaction_record_path = os.path.join(os.path.dirname(__file__), "Transaction Record.py")
+        transaction_record_path = os.path.join(os.path.dirname(__file__), "Transaction Record.py")  # Ensure the filename matches
         try:
             subprocess.run(["python", transaction_record_path], check=True)
         except subprocess.CalledProcessError as e:
