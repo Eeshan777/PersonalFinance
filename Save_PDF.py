@@ -14,7 +14,7 @@ def save_interest_calculator_pdf(entries, filename="interest_calculator_report.p
     c.setFont("Helvetica", 12)
 
     # Table headers
-    headers = ["Deposit Date", "Maturity Date", "Amount Deposited", "Interest Rate", "Time of Maturity", "Maturity Amount"]
+    headers = ["Deposit Date", "Maturity Date", "Amount Deposited", "Interest Rate", "Time of Maturity", "Maturity Amount", "Deposit Type"]
     x_offset = 50
     y_offset = height - 100
 
@@ -32,6 +32,7 @@ def save_interest_calculator_pdf(entries, filename="interest_calculator_report.p
         c.drawString(350, y_offset, str(entry['interest_rate']))
         c.drawString(450, y_offset, str(entry['time_of_maturity']))
         c.drawString(550, y_offset, str(entry['maturity_amount']))
+        c.drawString(650, y_offset, entry['deposit_type'])  # New column for deposit type
         y_offset -= 20  # Move down for the next row
 
     c.save()
@@ -80,7 +81,7 @@ def save_transaction_record_pdf(entries, filename="transaction_record_report.pdf
 def main():
     # Example usage
     interest_entries = [
-        {'deposit_date': datetime(2023, 1, 1), 'maturity_date': datetime(2024, 1, 1), 'amount': 1000, 'interest_rate': 5, 'time_of_maturity': 1, 'maturity_amount': 1050},
+        {'deposit_date': datetime(2023, 1, 1), 'maturity_date': datetime(2024, 1, 1), 'amount': 1000, 'interest_rate': 5, 'time_of_maturity': 1, 'maturity_amount': 1050, 'deposit_type': 'Cumulative'},
         # Add more entries as needed
     ]
 

@@ -188,6 +188,16 @@ class TransactionRecord:
         c.save()
         messagebox.showinfo("Success", f"PDF saved as {filename}")
 
+    def log_interest_calculation(self, deposit_date, maturity_date, amount, interest_rate, time_of_maturity, maturity_amount, deposit_type):
+        """Log the interest calculation as a transaction."""
+        self.entries.append({
+            'date': maturity_date,
+            'particular': f"Interest from {deposit_type} FD",
+            'amount': maturity_amount,
+            'type': 'Income'  # Assuming interest is considered income
+        })
+        self.update_treeview()  # Update the display
+
 def run_app():
     """Function to run the application."""
     root = tk.Tk()
