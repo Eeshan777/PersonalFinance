@@ -3,35 +3,42 @@ from tkinter import messagebox, ttk
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from Transaction_Record import TransactionRecord  # Ensure this import is correct
+from tkcalendar import DateEntry  # Import DateEntry from tkcalendar
 
 class InterestCalculator:
-    def __init__(self, root, transaction_record):
+    def __init__(self, root):
         self.root = root
         self.root.title("Interest Calculator")
-        self.transaction_record = transaction_record  # Store the TransactionRecord instance
 
         # Create and place labels and entries
-        tk.Label(root, text="Deposit Type:").grid(row=0, column=0, padx=10, pady=10)
+        tk.Label(root, text="Date of Deposit (DD/MM/YYYY):").grid(row=0, column=0, padx=10, pady=10)
+        self.date_entry = DateEntry(root, date_pattern='dd/mm/yyyy')  # Use DateEntry for calendar
+        self.date_entry.grid(row=0, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Amount Deposited:").grid(row=1, column=0, padx=10, pady=10)
+        self.deposit_entry = tk.Entry(root)
+        self.deposit_entry.grid(row=1, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Annual Interest Rate (%):").grid(row=2, column=0, padx=10, pady=10)
+        self.rate_entry = tk.Entry(root)
+        self.rate_entry.grid(row=2, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Time of Maturity:").grid(row=3, column=0, padx=10, pady=10)
+        self.time_combobox = ttk.Combobox(root, values=["1 year", "2 years", "3 years", "5 years", "10 years"], state="readonly")
+        self.time_combobox.grid(row=3, column=1, padx=10, pady=10)
+        self.time_combobox.set("Select Time Period")
+
+        tk.Label(root, text="Deposit Type:").grid(row=4, column=0, padx=10, pady=10)
         self.deposit_type_combobox = ttk.Combobox(root, values=["Cumulative", "Non-Cumulative"], state="readonly")
-        self.deposit_type_combobox.grid(row=0, column=1, padx=10, pady=10)
+        self.deposit_type_combobox.grid(row=4, column=1, padx=10, pady=10)
         self.deposit_type_combobox.set("Select Deposit Type")
 
-        tk.Label(root, text="Date of Deposit (DD/MM/YYYY):").grid(row=1, column=0, padx=10, pady=10)
-        self.date_entry = tk.Entry(root)
-        self.date_entry.grid(row=1, column=1, padx=10, pady=10)
-
-        tk.Label(root, text="Amount Deposited:").grid(row=2, column=0, padx=10, pady=10)
-        self.deposit_entry = tk.Entry(root)
-        self.deposit_entry.grid(row=2, column=1, padx=10, pady=10)
-
-        tk.Label(root, text="Annual Interest Rate (%):").grid(row=3, column=0, padx=10, pady=10)
-        self.rate_entry = tk.Entry(root)
-        self.rate_entry.grid(row=3, column=1, padx=10, pady=10)
-
-        tk.Label(root, text="Time of Maturity (Years):").grid(row=4, column=0, padx=10, pady=10)
-        self.time_entry = tk.Entry(root)
-        self.time_entry.grid(row=4, column=1, padx=10, pady=10)
+        # Bind the Enter key to calculate and move focus
+        self.date_entry.bind("<Return>", lambda event: self.deposit_entry.focus_set())
+        self.deposit_entry.bind("<Return>", lambda event: self.rate_entry.focus_set())
+        self.rate_entry.bind("<Return>", lambda event: self.time_combobox.focus_set())
+        self.time_combobox.bind("<Return>", lambda event: self.deposit_type_combobox.focus_set())
+        self.deposit_type_combobox.bind("<Return>", lambda event: self.calculate())
 
         # Create and place the result table
         self.columns = ("Deposit Date", "Maturity Date", "Amount Deposited", "Interest Rate", "Time of Maturity", "Maturity Amount", "Deposit Type")
@@ -93,14 +100,14 @@ class InterestCalculator:
 
     def calculate(self):
         # Validate each input individually
-        deposit_type = self.deposit_type_combobox.get()
         deposit_date = self.date_entry.get()
         money_deposited = self.deposit_entry.get()
         interest_rate = self.rate_entry.get()
-        time_of_maturity = self.time_entry.get()
+        time_of_maturity = self.time_combobox.get()
+        deposit_type = self.deposit_type_combobox.get()
 
         # Validate inputs
-        if deposit_type == "Select Deposit Type" or not deposit_date or not money_deposited or not interest_rate or not time_of_maturity:
+        if not deposit_date or not money_deposited or not interest_rate or time_of_maturity == "Select Time Period" or deposit_type == "Select Deposit Type":
             messagebox.showwarning("Input Error", "Please fill in all fields.")
             return
 
@@ -119,11 +126,7 @@ class InterestCalculator:
             return
 
         # Convert time of maturity to numeric value
-        try:
-            time_of_maturity_value = float(time_of_maturity)  # Get the numeric part from the entry
-        except ValueError:
-            messagebox.showwarning("Input Error", "Please enter a valid number for time of maturity.")
-            return
+        time_of_maturity_value = float(time_of_maturity.split()[0])  # Get the numeric part from the dropdown
 
         # Calculate maturity date
         maturity_date_obj = deposit_date_obj.replace(year=deposit_date_obj.year + int(time_of_maturity_value))
@@ -132,18 +135,6 @@ class InterestCalculator:
         is_cumulative = deposit_type == "Cumulative"
         maturity_amount = self.calculate_maturity_amount(money_deposited_value, interest_rate_value, time_of_maturity_value, is_cumulative)
 
-        # Log the interest calculation in the Transaction Record
-        self.transaction_record.log_interest_calculation(
-            deposit_date_obj,
-            maturity_date_obj,
-            money_deposited_value,
-            interest_rate_value,
-            time_of_maturity_value,
-            maturity_amount,
-            deposit_type
-        )
-
-        # Add entry to the list
         self.entries.append({
             'deposit_date': deposit_date_obj,
             'maturity_date': maturity_date_obj,
@@ -151,7 +142,7 @@ class InterestCalculator:
             'interest_rate': interest_rate_value,
             'time_of_maturity': time_of_maturity_value,
             'maturity_amount': maturity_amount,
-            'deposit_type': deposit_type
+            'deposit_type': deposit_type  # Store deposit type
         })
 
         # Sort entries by maturity date
@@ -177,11 +168,11 @@ class InterestCalculator:
         self.clear_inputs()
 
     def clear_inputs(self):
-        self.deposit_type_combobox.set("Select Deposit Type")
-        self.date_entry.delete(0, tk.END)
+        self.date_entry.set_date(datetime.now())  # Reset to today's date
         self.deposit_entry.delete(0, tk.END)
         self.rate_entry.delete(0, tk.END)
-        self.time_entry.delete(0, tk.END)
+        self.time_combobox.set("Select Time Period")
+        self.deposit_type_combobox.set("Select Deposit Type")
 
     def delete_entry(self):
         selected_item = self.result_table.selection()
@@ -232,13 +223,11 @@ class InterestCalculator:
         c.save()
         messagebox.showinfo("Success", f"PDF saved as {filename}")
 
-def run_app(transaction_record):
+def run_app():
     """Function to run the application."""
     root = tk.Tk()
-    app = InterestCalculator(root, transaction_record)
+    app = InterestCalculator(root)
     root.mainloop()
 
 if __name__ == "__main__":
-    root = tk.Tk()  # Create a Tkinter root window
-    transaction_record = TransactionRecord(root)  # Pass the root window to the constructor
-    run_app(transaction_record)
+    run_app()

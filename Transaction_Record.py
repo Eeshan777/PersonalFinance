@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from tkcalendar import DateEntry  # Import DateEntry from tkcalendar
 
 class TransactionRecord:
     def __init__(self, root):
@@ -33,8 +34,8 @@ class TransactionRecord:
         self.amount_entry.bind('<Return>', lambda event: self.date_entry.focus_set())  # Move to Date
 
         # Date
-        tk.Label(root, text="Date (DD/MM/YYYY):").grid(row=3, column=0, padx=10, pady=5)
-        self.date_entry = tk.Entry(root)
+        tk.Label(root, text="Date:").grid(row=3, column=0, padx=10, pady=5)
+        self.date_entry = DateEntry(root, date_pattern='dd/mm/yyyy')  # Use DateEntry for calendar
         self.date_entry.grid(row=3, column=1, padx=10, pady=5)
         self.date_entry.bind('<Return>', lambda event: self.add_entry())  # Add entry
 
@@ -93,7 +94,7 @@ class TransactionRecord:
             self.entries.append({'date': date_obj, 'particular': particular, 'amount': amount_value, 'type': entry_type})
             self.particular_entry.delete(0, tk.END)
             self.amount_entry.delete(0, tk.END)
-            self.date_entry.delete(0, tk.END)
+            self.date_entry.set_date(datetime.now())  # Reset date to today
             self.update_treeview()
         else:
             messagebox.showwarning("Input Error", "Please fill in all fields.")
@@ -187,16 +188,6 @@ class TransactionRecord:
 
         c.save()
         messagebox.showinfo("Success", f"PDF saved as {filename}")
-
-    def log_interest_calculation(self, deposit_date, maturity_date, amount, interest_rate, time_of_maturity, maturity_amount, deposit_type):
-        """Log the interest calculation as a transaction."""
-        self.entries.append({
-            'date': maturity_date,
-            'particular': f"Interest from {deposit_type} FD",
-            'amount': maturity_amount,
-            'type': 'Income'  # Assuming interest is considered income
-        })
-        self.update_treeview()  # Update the display
 
 def run_app():
     """Function to run the application."""
