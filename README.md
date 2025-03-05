@@ -1,23 +1,26 @@
 # Personal Finance
 
 ## Overview
-A simple tool for managing personal finances, including an **Interest Calculator** and a **Transaction Record** system.
+A tool for managing personal finances with an **Interest Calculator** and **Transaction Record**, including user authentication and PDF export.
 
 ## Features
-- **Interest Calculator**: Computes maturity amounts and generates PDF reports.
-- **Transaction Record**: Logs income/expenses and tracks balances.
+- **Login & Signup** for secure access.
+- **Interest Calculator**: Computes maturity amounts, supports different deposit types, and saves reports as PDFs.
+- **Transaction Record**: Logs income/expenses, calculates balance, allows deletion, and exports reports as PDFs.
 
 ## Installation
 Ensure Python is installed, then run:
 ```bash
-pip install reportlab
+pip install reportlab tkcalendar
 ```
 
 ## Usage
-Launch the app with:
+1. Run:
 ```bash
-python Main.py
+python LoginUser.py
 ```
+2. Log in or sign up.
+3. Access the **Interest Calculator** or **Transaction Record**.
 
 ## Author
 **Eeshan Amdekar**
