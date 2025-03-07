@@ -1,15 +1,19 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 from datetime import datetime
+from tkcalendar import DateEntry
+import sqlite3
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from tkcalendar import DateEntry  # Import DateEntry from tkcalendar
 
 class TransactionRecord:
     def __init__(self, root):
         self.root = root
         self.root.title("Income and Expense Management")
         self.entries = []
+
+        # Create database and table if not exists
+        self.create_database()
 
         # Type Selection
         tk.Label(root, text="Select Type:").grid(row=0, column=0, padx=10, pady=5)
@@ -62,6 +66,23 @@ class TransactionRecord:
         self.tree.grid(row=5, column=0, columnspan=3, padx=10, pady=5)
 
         self.update_labels()  # Initialize labels based on default selection
+        self.date_entry.focus_set()  # Set focus to the date entry
+
+    def create_database(self):
+        """Create a SQLite database and table for transactions."""
+        conn = sqlite3.connect("finance_data.db")
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY,
+                date TEXT,
+                particular TEXT,
+                amount REAL,
+                type TEXT
+            )
+        ''')
+        conn.commit()
+        conn.close()
 
     def update_labels(self, event=None):
         """Update the labels based on the selected type."""
@@ -90,6 +111,9 @@ class TransactionRecord:
                 messagebox.showwarning("Input Error", "Ensure the date is in DD/MM/YYYY format and valid.")
                 return
 
+            # Add entry to the database
+            self.save_to_database(date_obj, particular, amount_value, entry_type)
+
             # Add entry to the list
             self.entries.append({'date': date_obj, 'particular': particular, 'amount': amount_value, 'type': entry_type})
             self.particular_entry.delete(0, tk.END)
@@ -98,6 +122,15 @@ class TransactionRecord:
             self.update_treeview()
         else:
             messagebox.showwarning("Input Error", "Please fill in all fields.")
+
+    def save_to_database(self, date, particular, amount, entry_type):
+        """Save the transaction entry to the database."""
+        conn = sqlite3.connect("finance_data.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO transactions (date, particular, amount, type) VALUES (?, ?, ?, ?)",
+                       (date.strftime("%d/%m/%Y"), particular, amount, entry_type))
+        conn.commit()
+        conn.close()
 
     def delete_entry(self):
         """Delete the selected entry from the Treeview and the list."""

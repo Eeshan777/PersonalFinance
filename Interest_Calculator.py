@@ -3,12 +3,16 @@ from tkinter import messagebox, ttk
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from tkcalendar import DateEntry  # Import DateEntry from tkcalendar
+from tkcalendar import DateEntry
+import sqlite3
 
 class InterestCalculator:
     def __init__(self, root):
         self.root = root
         self.root.title("Interest Calculator")
+
+        # Create database and table if not exists
+        self.create_database()
 
         # Create and place labels and entries
         tk.Label(root, text="Date of Deposit (DD/MM/YYYY):").grid(row=0, column=0, padx=10, pady=10)
@@ -63,6 +67,25 @@ class InterestCalculator:
 
         # Store entries for sorting
         self.entries = []
+
+    def create_database(self):
+        """Create a SQLite database and table for interest calculations."""
+        conn = sqlite3.connect("finance_data.db")
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS interest_calculations (
+                id INTEGER PRIMARY KEY,
+                deposit_date TEXT,
+                maturity_date TEXT,
+                amount REAL,
+                interest_rate REAL,
+                time_of_maturity REAL,
+                maturity_amount REAL,
+                deposit_type TEXT
+            )
+        ''')
+        conn.commit()
+        conn.close()
 
     def calculate_maturity_amount(self, principal, rate, time, is_cumulative):
         # Calculate the maturity amount using the compound interest formula
@@ -135,6 +158,9 @@ class InterestCalculator:
         is_cumulative = deposit_type == "Cumulative"
         maturity_amount = self.calculate_maturity_amount(money_deposited_value, interest_rate_value, time_of_maturity_value, is_cumulative)
 
+        # Save to database
+        self.save_to_database(deposit_date_obj, maturity_date_obj, money_deposited_value, interest_rate_value, time_of_maturity_value, maturity_amount, deposit_type)
+
         self.entries.append({
             'deposit_date': deposit_date_obj,
             'maturity_date': maturity_date_obj,
@@ -166,6 +192,15 @@ class InterestCalculator:
 
         # Clear the input fields
         self.clear_inputs()
+
+    def save_to_database(self, deposit_date, maturity_date, amount, interest_rate, time_of_maturity, maturity_amount, deposit_type):
+        """Save the interest calculation entry to the database."""
+        conn = sqlite3.connect("finance_data.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO interest_calculations (deposit_date, maturity_date, amount, interest_rate, time_of_maturity, maturity_amount, deposit_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (deposit_date.strftime("%d/%m/%Y"), maturity_date.strftime("%d/%m/%Y"), amount, interest_rate, time_of_maturity, maturity_amount, deposit_type))
+        conn.commit()
+        conn.close()
 
     def clear_inputs(self):
         self.date_entry.set_date(datetime.now())  # Reset to today's date

@@ -45,15 +45,15 @@ class BudgetReport:
 
         transactions = []
         if month_year:
-            cursor.execute("SELECT * FROM transactions WHERE month_year=?", (month_year,))
+            cursor.execute("SELECT * FROM transactions WHERE strftime('%m/%Y', date) = ?", (month_year,))
             transactions = cursor.fetchall()
         elif year:
-            cursor.execute("SELECT * FROM transactions WHERE month_year LIKE ?", ('%' + year,)) 
+            cursor.execute("SELECT * FROM transactions WHERE date LIKE ?", ('%' + year,))
             transactions = cursor.fetchall()
 
         interest_data = []
         if year:
-            cursor.execute("SELECT * FROM interest_calculations WHERE month_year LIKE ?", ('%' + year,))
+            cursor.execute("SELECT * FROM interest_calculations WHERE deposit_date LIKE ?", ('%' + year,))
             interest_data = cursor.fetchall()
 
         conn.close()
@@ -61,9 +61,9 @@ class BudgetReport:
 
     def calculate_budget(self, transactions, interest_data):
         """Calculate the budget based on transactions and interest data."""
-        total_income = sum(t[5] for t in transactions if t[2] == "Income")
-        total_expenses = sum(t[5] for t in transactions if t[2] == "Expense")
-        total_interest = sum(i[8] for i in interest_data)  # Assuming maturity amount is at index 8
+        total_income = sum(t[3] for t in transactions if t[4] == "Income")
+        total_expenses = sum(t[3] for t in transactions if t[4] == "Expense")
+        total_interest = sum(i[6] for i in interest_data)  # Assuming maturity amount is at index 6
 
         budget = total_income - total_expenses + total_interest
         return total_income, total_expenses, budget
