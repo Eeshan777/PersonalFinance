@@ -11,34 +11,35 @@ class BudgetReport:
         self.root = root
         self.root.title("Budget Report Generator")
 
-        # User input for month/year and report type
+        # User input for month/year
         tk.Label(root, text="Month/Year (MM/YYYY):").grid(row=0, column=0, padx=10, pady=5)
         self.month_year_entry = tk.Entry(root)
         self.month_year_entry.grid(row=0, column=1, padx=10, pady=5)
-
-        tk.Label(root, text="Year (YYYY):").grid(row=1, column=0, padx=10, pady=5)
-        self.year_entry = tk.Entry(root)
-        self.year_entry.grid(row=1, column=1, padx=10, pady=5)
+        self.month_year_entry.bind('<Return>', lambda event: self.report_type_combobox.focus_set())  # Move to Report Type
 
         self.report_type_var = tk.StringVar(value="Monthly")
-        tk.Label(root, text="Report Type:").grid(row=2, column=0, padx=10, pady=5)
-        report_type_combobox = ttk.Combobox(root, textvariable=self.report_type_var, values=["Monthly", "Yearly"], state="readonly")
-        report_type_combobox.grid(row=2, column=1, padx=10, pady=5)
+        tk.Label(root, text="Report Type:").grid(row=1, column=0, padx=10, pady=5)
+        self.report_type_combobox = ttk.Combobox(root, textvariable=self.report_type_var, values=["Monthly", "Yearly"], state="readonly")
+        self.report_type_combobox.grid(row=1, column=1, padx=10, pady=5)
+        self.report_type_combobox.bind('<Return>', lambda event: self.generate_report())  # Generate report on Enter
 
         generate_button = tk.Button(root, text="Generate Report", command=self.generate_report)
-        generate_button.grid(row=3, columnspan=2, pady=10)
+        generate_button.grid(row=2, columnspan=2, pady=10)
 
         save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf)
-        save_pdf_button.grid(row=4, columnspan=2, pady=10)
+        save_pdf_button.grid(row=3, columnspan=2, pady=10)
 
         # Text widget for displaying the report
         self.report_display = tk.Text(root, height=10, width=50)
-        self.report_display.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+        self.report_display.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
         self.report_display.config(state=tk.DISABLED)  # Make it read-only initially
 
         self.report_data = None
 
-    def fetch_data(self, month_year=None, year=None):
+        # Set focus to the month/year entry
+        self.month_year_entry.focus_set()
+
+    def fetch_data(self, month_year=None):
         """Fetch transactions and interest data from the database."""
         conn = sqlite3.connect("finance_data.db")
         cursor = conn.cursor()
@@ -47,13 +48,10 @@ class BudgetReport:
         if month_year:
             cursor.execute("SELECT * FROM transactions WHERE strftime('%m/%Y', date) = ?", (month_year,))
             transactions = cursor.fetchall()
-        elif year:
-            cursor.execute("SELECT * FROM transactions WHERE date LIKE ?", ('%' + year,))
-            transactions = cursor.fetchall()
 
         interest_data = []
-        if year:
-            cursor.execute("SELECT * FROM interest_calculations WHERE deposit_date LIKE ?", ('%' + year,))
+        if month_year:
+            cursor.execute("SELECT * FROM interest_calculations WHERE deposit_date LIKE ?", ('%' + month_year.split('/')[1],))
             interest_data = cursor.fetchall()
 
         conn.close()
@@ -70,11 +68,10 @@ class BudgetReport:
 
     def generate_report(self):
         """Generate the budget report."""
-        month_year = self.month_year_entry.get()
-        year = self.year_entry.get()
+        month_year = self.month_year_entry.get()  # Get the typed month/year
         report_type = self.report_type_var.get()
 
-        transactions, interest_data = self.fetch_data(month_year, year)
+        transactions, interest_data = self.fetch_data(month_year)
 
         if not transactions and not interest_data:
             messagebox.showwarning("No Data", "No transactions or interest data found for the specified period.")
@@ -110,6 +107,12 @@ class BudgetReport:
         """Create a pie chart for income vs expenses."""
         labels = ['Income', 'Expenses']
         sizes = [self.report_data['total_income'], self.report_data['total_expenses']]
+
+        # Check for valid sizes
+        if sizes[0] < 0 or sizes[1] < 0:
+            messagebox.showwarning("Invalid Data", "Income and expenses must be non-negative.")
+            return
+
         colors = ['#4CAF50', '#FF5733']
         explode = (0.1, 0)  # explode the 1st slice (Income)
 
@@ -129,8 +132,7 @@ class BudgetReport:
         save_budget_report_pdf(self.report_data, budget_pdf_filename)
 
         # Reset the input fields after saving
-        self.month_year_entry.delete(0, tk.END)
-        self.year_entry.delete(0, tk.END)
+        self.month_year_entry.delete(0, tk.END)  # Clear the month/year entry
         self.report_type_var.set("Monthly")  # Reset to default report type
 
         # Clear the report data
@@ -140,11 +142,11 @@ class BudgetReport:
         print("Report data has been cleared. Ready for new input.")
         self.month_year_entry.focus_set()  # Set focus back to the month/year entry field
 
-def run_budget_report_app():
-    """Function to run the budget report application."""
+def run_app():
+    """Function to run the application."""
     root = tk.Tk()
     app = BudgetReport(root)
     root.mainloop()
 
 if __name__ == "__main__":
-    run_budget_report_app()
+    run_app()

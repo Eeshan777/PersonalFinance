@@ -1,9 +1,8 @@
 import os
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from datetime import datetime
-import matplotlib.pyplot as plt
 from tkinter import messagebox
 
 def save_interest_calculator_pdf(entries, filename):
@@ -48,18 +47,12 @@ def save_interest_calculator_pdf(entries, filename):
     # Apply the style to the table
     table.setStyle(style)
 
-    # Check if the table fits on one page
-    max_rows_per_page = 20  # Adjust this number based on your layout
-    for i in range(0, len(data), max_rows_per_page):
-        chunk = data[i:i + max_rows_per_page]
-        table_chunk = Table(chunk)
-        table_chunk.setStyle(style)
-        elements.append(table_chunk)
-        elements.append(Spacer(1, 12))  # Add space between tables
+    # Add the table to the elements list
+    elements.append(table)
 
     # Build the PDF
     pdf.build(elements)
-    return filename
+    print(f"Interest Calculator PDF saved as {filename}")
 
 def save_transaction_record_pdf(entries, filename):
     """Generate a PDF report for the Transaction Record entries."""
@@ -114,25 +107,12 @@ def save_transaction_record_pdf(entries, filename):
 
     # Build the PDF
     pdf.build(elements)
-    return filename
+    print(f"Transaction Record PDF saved as {filename}")
 
 def save_budget_report_pdf(report_data, filename):
     """Generate a PDF report for the Budget Report."""
     pdf = SimpleDocTemplate(filename, pagesize=letter)
     elements = []
-
-    # Create a pie chart for income vs expenses
-    labels = ['Income', 'Expenses']
-    sizes = [report_data['total_income'], report_data['total_expenses']]
-    colors = ['#4CAF50', '#FF5733']
-    explode = (0.1, 0)  # explode the 1st slice (Income)
-
-    plt.figure(figsize=(8, 6))
-    plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.title("Income vs Expenses")
-    plt.savefig("Income_vs_Expenses.png")  # Save the pie chart as a PNG file
-    plt.close()  # Close the plot to free memory
 
     # Table headers for the budget report
     headers = ["Total Income", "Total Expenses", "Calculated Budget"]
@@ -160,18 +140,13 @@ def save_budget_report_pdf(report_data, filename):
 
     # Add the budget table to the elements list
     elements.append(budget_table)
-    elements.append(Spacer(1, 12))  # Add space between tables
-
-    # Add the pie chart image to the PDF
-    elements.append(Image("Income_vs_Expenses.png"))
 
     # Build the PDF
     pdf.build(elements)
-
-    # Show success message
-    messagebox.showinfo("Success", f"Budget report saved as {filename}")
+    print(f"Budget report saved as {filename}")
 
 def main():
+    # Example usage of the PDF saving functions
     interest_entries = [
         {'deposit_date': datetime(2023, 1, 1), 'maturity_date': datetime(2024, 1, 1), 'amount': 1000, 'interest_rate': 5, 'time_of_maturity': 1, 'maturity_amount': 1050, 'deposit_type': 'Cumulative'},
         # Add more entries as needed for testing
@@ -189,16 +164,6 @@ def main():
     # Save the transaction record PDF
     transaction_pdf_filename = "transaction_record_report.pdf"
     save_transaction_record_pdf(transaction_entries, transaction_pdf_filename)
-
-    # Example budget report data
-    budget_report_data = {
-        "total_income": 5000,
-        "total_expenses": 3000,
-        "budget": 2000,
-        "report_type": "Monthly"
-    }
-    budget_pdf_filename = "budget_report.pdf"
-    save_budget_report_pdf(budget_report_data, budget_pdf_filename)
 
 if __name__ == "__main__":
     main()
