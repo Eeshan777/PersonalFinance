@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import messagebox
 import subprocess
 from BudgetReport import BudgetReport  # Ensure this matches the class name in Budget_Report.py
+from InterestCalculator import InterestCalculator
+from TransactionRecord import TransactionRecord
 
 class PersonalFinance:
     def __init__(self, root, username):
@@ -13,34 +15,34 @@ class PersonalFinance:
         self.show_welcome_message()
 
     def show_welcome_message(self):
-        welcome_label = tk.Label(self.root, text=f"Welcome, {self.username}!", font=("Helvetica", 24))
+        welcome_label = tk.Label(self.root, text=f"Welcome, {self.username}!", font=("Helvetica", 24), bg="#F5F5F5", fg="#003366")
         welcome_label.grid(row=0, column=0, columnspan=3, padx=10, pady=20)
 
         # Button to launch Interest Calculator
-        interest_calculator_button = tk.Button(self.root, text="Interest Calculator", command=self.launch_interest_calculator, width=30)
+        interest_calculator_button = tk.Button(self.root, text="Interest Calculator", command=self.launch_interest_calculator, width=30, bg="#0073E6", fg="#FFFFFF")
         interest_calculator_button.grid(row=1, column=0, padx=10, pady=10)
+        interest_calculator_button.bind("<Enter>", lambda e: interest_calculator_button.config(bg="#005BB5"))
+        interest_calculator_button.bind("<Leave>", lambda e: interest_calculator_button.config(bg="#0073E6"))
 
         # Button to launch Transaction Record
-        transaction_record_button = tk.Button(self.root, text="Transaction Record", command=self.launch_transaction_record, width=30)
+        transaction_record_button = tk.Button(self.root, text="Transaction Record", command=self.launch_transaction_record, width=30, bg="#0073E6", fg="#FFFFFF")
         transaction_record_button.grid(row=1, column=1, padx=10, pady=10)
+        transaction_record_button.bind("<Enter>", lambda e: transaction_record_button.config(bg="#005BB5"))
+        transaction_record_button.bind("<Leave>", lambda e: transaction_record_button.config(bg="#0073E6"))
 
         # Button to launch Budget Report
-        budget_report_button = tk.Button(self.root, text="Generate Budget Report", command=self.launch_budget_report, width=30)
+        budget_report_button = tk.Button(self.root, text="Generate Budget Report", command=self.launch_budget_report, width=30, bg="#0073E6", fg="#FFFFFF")
         budget_report_button.grid(row=1, column=2, padx=10, pady=10)
+        budget_report_button.bind("<Enter>", lambda e: budget_report_button.config(bg="#005BB5"))
+        budget_report_button.bind("<Leave>", lambda e: budget_report_button.config(bg="#0073E6"))
 
     def launch_interest_calculator(self):
-        interest_calculator_path = os.path.join(os.path.dirname(__file__), "Interest_Calculator.py")
-        try:
-            subprocess.run(["python", interest_calculator_path], check=True)
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"Failed to launch Interest Calculator: {e}")
+        interest_calculator_window = tk.Toplevel(self.root)
+        InterestCalculator(interest_calculator_window)  # Create an instance of InterestCalculator
 
     def launch_transaction_record(self):
-        transaction_record_path = os.path.join(os.path.dirname(__file__), "Transaction_Record.py")
-        try:
-            subprocess.run(["python", transaction_record_path], check=True)
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"Failed to launch Transaction Record: {e}")
+        transaction_record_window = tk.Toplevel(self.root)
+        TransactionRecord(transaction_record_window)  # Create an instance of TransactionRecord
 
     def launch_budget_report(self):
         budget_report_window = tk.Toplevel(self.root)

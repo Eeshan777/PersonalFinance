@@ -10,27 +10,32 @@ class BudgetReport:
     def __init__(self, root):
         self.root = root
         self.root.title("Budget Report Generator")
+        self.root.configure(bg="#F5F5F5")  # Set background color
 
         # User input for month/year
-        tk.Label(root, text="Month/Year (MM/YYYY):").grid(row=0, column=0, padx=10, pady=5)
-        self.month_year_entry = tk.Entry(root)
+        tk.Label(root, text="Month/Year (MM/YYYY):", bg="#F5F5F5", fg="#003366").grid(row=0, column=0, padx=10, pady=5)
+        self.month_year_entry = tk.Entry(root, bg="#FFFFFF")
         self.month_year_entry.grid(row=0, column=1, padx=10, pady=5)
         self.month_year_entry.bind('<Return>', lambda event: self.report_type_combobox.focus_set())  # Move to Report Type
 
         self.report_type_var = tk.StringVar(value="Monthly")
-        tk.Label(root, text="Report Type:").grid(row=1, column=0, padx=10, pady=5)
+        tk.Label(root, text="Report Type:", bg="#F5F5F5", fg="#003366").grid(row=1, column=0, padx=10, pady=5)
         self.report_type_combobox = ttk.Combobox(root, textvariable=self.report_type_var, values=["Monthly", "Yearly"], state="readonly")
         self.report_type_combobox.grid(row=1, column=1, padx=10, pady=5)
         self.report_type_combobox.bind('<Return>', lambda event: self.generate_report())  # Generate report on Enter
 
-        generate_button = tk.Button(root, text="Generate Report", command=self.generate_report)
+        generate_button = tk.Button(root, text="Generate Report", command=self.generate_report, bg="#0073E6", fg="#FFFFFF")
         generate_button.grid(row=2, columnspan=2, pady=10)
+        generate_button.bind("<Enter>", lambda e: generate_button.config(bg="#005BB5"))
+        generate_button.bind("<Leave>", lambda e: generate_button.config(bg="#0073E6"))
 
-        save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf)
+        save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf, bg="#0073E6", fg="#FFFFFF")
         save_pdf_button.grid(row=3, columnspan=2, pady=10)
+        save_pdf_button.bind("<Enter>", lambda e: save_pdf_button.config(bg="#005BB5"))
+        save_pdf_button.bind("<Leave>", lambda e: save_pdf_button.config(bg="#0073E6"))
 
         # Text widget for displaying the report
-        self.report_display = tk.Text(root, height=10, width=50)
+        self.report_display = tk.Text(root, height=10, width=50, bg="#FFFFFF")
         self.report_display.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
         self.report_display.config(state=tk.DISABLED)  # Make it read-only initially
 

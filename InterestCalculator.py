@@ -10,29 +10,30 @@ class InterestCalculator:
     def __init__(self, root):
         self.root = root
         self.root.title("Interest Calculator")
+        self.root.configure(bg="#F5F5F5")  # Set background color
 
         # Create database and table if not exists
         self.create_database()
 
         # Create and place labels and entries
-        tk.Label(root, text="Date of Deposit (DD/MM/YYYY):").grid(row=0, column=0, padx=10, pady=10)
+        tk.Label(root, text="Date of Deposit (DD/MM/YYYY):", bg="#F5F5F5", fg="#003366").grid(row=0, column=0, padx=10, pady=10)
         self.date_entry = DateEntry(root, date_pattern='dd/mm/yyyy')  # Use DateEntry for calendar
         self.date_entry.grid(row=0, column=1, padx=10, pady=10)
 
-        tk.Label(root, text="Amount Deposited:").grid(row=1, column=0, padx=10, pady=10)
-        self.deposit_entry = tk.Entry(root)
+        tk.Label(root, text="Amount Deposited:", bg="#F5F5F5", fg="#003366").grid(row=1, column=0, padx=10, pady=10)
+        self.deposit_entry = tk.Entry(root, bg="#FFFFFF")
         self.deposit_entry.grid(row=1, column=1, padx=10, pady=10)
 
-        tk.Label(root, text="Annual Interest Rate (%):").grid(row=2, column=0, padx=10, pady=10)
-        self.rate_entry = tk.Entry(root)
+        tk.Label(root, text="Annual Interest Rate (%):", bg="#F5F5F5", fg="#003366").grid(row=2, column=0, padx=10, pady=10)
+        self.rate_entry = tk.Entry(root, bg="#FFFFFF")
         self.rate_entry.grid(row=2, column=1, padx=10, pady=10)
 
-        tk.Label(root, text="Time of Maturity:").grid(row=3, column=0, padx=10, pady=10)
+        tk.Label(root, text="Time of Maturity:", bg="#F5F5F5", fg="#003366").grid(row=3, column=0, padx=10, pady=10)
         self.time_combobox = ttk.Combobox(root, values=["1 year", "2 years", "3 years", "5 years", "10 years"], state="readonly")
         self.time_combobox.grid(row=3, column=1, padx=10, pady=10)
         self.time_combobox.set("Select Time Period")
 
-        tk.Label(root, text="Deposit Type:").grid(row=4, column=0, padx=10, pady=10)
+        tk.Label(root, text="Deposit Type:", bg="#F5F5F5", fg="#003366").grid(row=4, column=0, padx=10, pady=10)
         self.deposit_type_combobox = ttk.Combobox(root, values=["Cumulative", "Non-Cumulative"], state="readonly")
         self.deposit_type_combobox.grid(row=4, column=1, padx=10, pady=10)
         self.deposit_type_combobox.set("Select Deposit Type")
@@ -55,12 +56,16 @@ class InterestCalculator:
             self.result_table.column(col, anchor="center")  # Center the text in each column
 
         # Create and place the delete button
-        delete_button = tk.Button(root, text="Delete Entry", command=self.delete_entry)
+        delete_button = tk.Button(root, text="Delete Entry", command=self.delete_entry, bg="#0073E6", fg="#FFFFFF")
         delete_button.grid(row=7, columnspan=3, pady=10)
+        delete_button.bind("<Enter>", lambda e: delete_button.config(bg="#005BB5"))
+        delete_button.bind("<Leave>", lambda e: delete_button.config(bg="#0073E6"))
 
         # Create and place the save as PDF button
-        save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf)
+        save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf, bg="#0073E6", fg="#FFFFFF")
         save_pdf_button.grid(row=8, columnspan=3, pady=10)
+        save_pdf_button.bind("<Enter>", lambda e: save_pdf_button.config(bg="#005BB5"))
+        save_pdf_button.bind("<Leave>", lambda e: save_pdf_button.config(bg="#0073E6"))
 
         # Set focus to the first entry field
         self.date_entry.focus()

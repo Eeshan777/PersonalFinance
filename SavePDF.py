@@ -1,7 +1,7 @@
 import os
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from datetime import datetime
 from tkinter import messagebox
 
@@ -32,13 +32,13 @@ def save_interest_calculator_pdf(entries, filename):
 
     # Define the style for the table
     style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Header background
+        ('BACKGROUND', (0, 0), (-1, 0), colors.hex2rgb("#336699")),  # Header background
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center align all cells
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header font
         ('FONTSIZE', (0, 0), (-1, 0), 10),  # Header font size
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Padding for header
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Body background
+        ('BACKGROUND', (0, 1), (-1, -1), colors.hex2rgb("#E6F2FF")),  # Body background
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # Body text color
         ('FONTSIZE', (0, 1), (-1, -1), 9),  # Body font size
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Grid lines
@@ -87,13 +87,13 @@ def save_transaction_record_pdf(entries, filename):
 
     # Define the style for the table
     style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Header background
+        ('BACKGROUND', (0, 0), (-1, 0), colors.hex2rgb("#336699")),  # Header background
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center align all cells
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header font
         ('FONTSIZE', (0, 0), (-1, 0), 12),  # Header font size
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Padding for header
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Body background
+        ('BACKGROUND', (0, 1), (-1, -1), colors.hex2rgb("#E6F2FF")),  # Body background
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # Body text color
         ('FONTSIZE', (0, 1), (-1, -1), 10),  # Body font size
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Grid lines
@@ -123,13 +123,13 @@ def save_budget_report_pdf(report_data, filename):
 
     # Define the style for the budget table
     budget_style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Header background
+        ('BACKGROUND', (0, 0), (-1, 0), colors.hex2rgb("#336699")),  # Header background
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center align all cells
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header font
         ('FONTSIZE', (0, 0), (-1, 0), 10),  # Header font size
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Padding for header
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Body background
+        ('BACKGROUND', (0, 1), (-1, -1), colors.hex2rgb("#E6F2FF")),  # Body background
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # Body text color
         ('FONTSIZE', (0, 1), (-1, -1), 9),  # Body font size
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Grid lines

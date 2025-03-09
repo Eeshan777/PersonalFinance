@@ -10,54 +10,59 @@ class TransactionRecord:
     def __init__(self, root):
         self.root = root
         self.root.title("Income and Expense Management")
+        self.root.configure(bg="#F5F5F5")  # Set background color
         self.entries = []
 
         # Create database and table if not exists
         self.create_database()
 
         # Type Selection
-        tk.Label(root, text="Select Type:").grid(row=0, column=0, padx=10, pady=5)
+        tk.Label(root, text="Select Type:", bg="#F5F5F5", fg="#003366").grid(row=0, column=0, padx=10, pady=5)
         self.type_var = tk.StringVar(value="Income")
         self.type_combobox = ttk.Combobox(root, textvariable=self.type_var, values=["Income", "Expense"], state="readonly")
         self.type_combobox.grid(row=0, column=1, padx=10, pady=5)
         self.type_combobox.bind("<<ComboboxSelected>>", self.update_labels)
 
         # Particular
-        tk.Label(root, text="Particular:").grid(row=1, column=0, padx=10, pady=5)
-        self.particular_entry = tk.Entry(root)
+        tk.Label(root, text="Particular:", bg="#F5F5F5", fg="#003366").grid(row=1, column=0, padx=10, pady=5)
+        self.particular_entry = tk.Entry(root, bg="#FFFFFF")
         self.particular_entry.grid(row=1, column=1, padx=10, pady=5)
         self.particular_entry.bind('<Return>', lambda event: self.amount_entry.focus_set())  # Move to Amount
 
         # Amount Label
-        self.amount_label = tk.Label(root, text="Amount:")
+        self.amount_label = tk.Label(root, text="Amount:", bg="#F5F5F5", fg="#003366")
         self.amount_label.grid(row=2, column=0, padx=10, pady=5)
 
         # Amount
-        self.amount_entry = tk.Entry(root)
+        self.amount_entry = tk.Entry(root, bg="#FFFFFF")
         self.amount_entry.grid(row=2, column=1, padx=10, pady=5)
         self.amount_entry.bind('<Return>', lambda event: self.date_entry.focus_set())  # Move to Date
 
         # Date
-        tk.Label(root, text="Date:").grid(row=3, column=0, padx=10, pady=5)
+        tk.Label(root, text="Date:", bg="#F5F5F5", fg="#003366").grid(row=3, column=0, padx=10, pady=5)
         self.date_entry = DateEntry(root, date_pattern='dd/mm/yyyy')  # Use DateEntry for calendar
         self.date_entry.grid(row=3, column=1, padx=10, pady=5)
         self.date_entry.bind('<Return>', lambda event: self.add_entry())  # Add entry
 
         # Delete Entry Button
-        self.delete_button = tk.Button(root, text="Delete Entry", command=self.delete_entry)
+        self.delete_button = tk.Button(root, text="Delete Entry", command=self.delete_entry, bg="#0073E6", fg="#FFFFFF")
         self.delete_button.grid(row=6, columnspan=3, pady=10)
+        self.delete_button.bind("<Enter>", lambda e: self.delete_button.config(bg="#005BB5"))
+        self.delete_button.bind("<Leave>", lambda e: self.delete_button.config(bg="#0073E6"))
 
         # Save as PDF Button
-        self.save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf)
+        self.save_pdf_button = tk.Button(root, text="Save as PDF", command=self.save_as_pdf, bg="#0073E6", fg="#FFFFFF")
         self.save_pdf_button.grid(row=7, columnspan=3, pady=10)
+        self.save_pdf_button.bind("<Enter>", lambda e: self.save_pdf_button.config(bg="#005BB5"))
+        self.save_pdf_button.bind("<Leave>", lambda e: self.save_pdf_button.config(bg="#0073E6"))
 
         # Treeview
         self.tree = ttk.Treeview(root, columns=("Date", "Particular", "Income", "Expenditure", "Balance"), show='headings')
-        self.tree.heading("Date", text="Date")
-        self.tree.heading("Particular", text="Particular")
-        self.tree.heading("Income", text="Income")
-        self.tree.heading("Expenditure", text="Expenditure")
-        self.tree.heading("Balance", text="Balance")
+        self.tree.heading("Date", text="Date", anchor="center")
+        self.tree.heading("Particular", text="Particular", anchor="center")
+        self.tree.heading("Income", text="Income", anchor="center")
+        self.tree.heading("Expenditure", text="Expenditure", anchor="center")
+        self.tree.heading("Balance", text="Balance", anchor="center")
 
         # Center the text in the columns
         for col in self.tree["columns"]:
