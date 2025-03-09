@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 import subprocess
-from Budget_Report import BudgetReport  # Ensure this matches the class name in Budget_Report.py
+from BudgetReport import BudgetReport  # Ensure this matches the class name in Budget_Report.py
 
 class PersonalFinance:
     def __init__(self, root, username):

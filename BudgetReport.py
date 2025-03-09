@@ -4,7 +4,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
-from Save_PDF import save_budget_report_pdf
+from SavePDF import save_budget_report_pdf
 
 class BudgetReport:
     def __init__(self, root):
