@@ -3,7 +3,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from datetime import datetime
-from tkinter import messagebox
+from PyQt5 import QtWidgets
 
 def save_interest_calculator_pdf(entries, filename):
     """Generate a PDF report for the Interest Calculator entries."""
@@ -116,7 +116,7 @@ def save_budget_report_pdf(report_data, filename):
 
     # Table headers for the budget report
     headers = ["Total Income", "Total Expenses", "Calculated Budget"]
-    data = [[report_data['total_income'], report_data['total_expenses'], report_data['budget']]]
+    data = [[report_data.get('total_income', 0), report_data.get('total_expenses', 0), report_data.get('budget', 0)]]
 
     # Create a Table for the budget report
     budget_table = Table([headers] + data)

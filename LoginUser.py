@@ -1,106 +1,125 @@
-import tkinter as tk
-from tkinter import messagebox
+import sys
 import os
+from PyQt5 import QtWidgets, QtGui
+import hashlib
 
-class Auth:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Signup/Login")
-        self.root.configure(bg="#F5F5F5")  # Set background color
-
+class Auth(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Signup/Login")
+        self.setStyleSheet("background-color: #F5F5F5;")
         self.username = None
         self.password = None
-
         self.show_auth_window()
 
     def show_auth_window(self):
-        tk.Label(self.root, text="Choose an option:", font=("Helvetica", 16), bg="#F5F5F5", fg="#003366").pack(pady=20)
+        layout = QtWidgets.QVBoxLayout()
+        label = QtWidgets.QLabel("Choose an option:")
+        label.setFont(QtGui.QFont("Helvetica", 16))
+        label.setStyleSheet("color: #003366;")
+        layout.addWidget(label)
 
-        signup_button = tk.Button(self.root, text="Sign Up", command=self.show_signup_window, bg="#0073E6", fg="#FFFFFF")
-        signup_button.pack(pady=10)
-        signup_button.bind("<Enter>", lambda e: signup_button.config(bg="#005BB5"))
-        signup_button.bind("<Leave>", lambda e: signup_button.config(bg="#0073E6"))
+        signup_button = QtWidgets.QPushButton("Sign Up")
+        signup_button.setStyleSheet("background-color: #0073E6; color: #FFFFFF;")
+        signup_button.clicked.connect(self.show_signup_window)
+        layout.addWidget(signup_button)
 
-        login_button = tk.Button(self.root, text="Login", command=self.show_login_window, bg="#0073E6", fg="#FFFFFF")
-        login_button.pack(pady=10)
-        login_button.bind("<Enter>", lambda e: login_button.config(bg="#005BB5"))
-        login_button.bind("<Leave>", lambda e: login_button.config(bg="#0073E6"))
+        login_button = QtWidgets.QPushButton("Login")
+        login_button.setStyleSheet("background-color: #0073E6; color: #FFFFFF;")
+        login_button.clicked.connect(self.show_login_window)
+        layout.addWidget(login_button)
+
+        self.setLayout(layout)
 
     def show_signup_window(self):
-        self.signup_window = tk.Toplevel(self.root)
-        self.signup_window.title("Sign Up")
-        self.signup_window.configure(bg="#F5F5F5")  # Set background color
+        self.signup_window = QtWidgets.QDialog(self)
+        self.signup_window.setWindowTitle("Sign Up")
+        self.signup_window.setStyleSheet("background-color: #F5F5F5;")
+        layout = QtWidgets.QVBoxLayout()
 
-        tk.Label(self.signup_window, text="Username:", bg="#F5F5F5", fg="#003366").grid(row=0, column=0, padx=10, pady=10)
-        self.signup_username_entry = tk.Entry(self.signup_window, bg="#FFFFFF")
-        self.signup_username_entry.grid(row=0, column=1, padx=10, pady=10)
-        self.signup_username_entry.bind('<Return>', lambda event: self.signup_password_entry.focus_set())
+        layout.addWidget(QtWidgets.QLabel("Username:", self.signup_window))
+        self.signup_username_entry = QtWidgets.QLineEdit(self.signup_window)
+        layout.addWidget(self.signup_username_entry)
 
-        tk.Label(self.signup_window, text="Password:", bg="#F5F5F5", fg="#003366").grid(row=1, column=0, padx=10, pady=10)
-        self.signup_password_entry = tk.Entry(self.signup_window, show='*', bg="#FFFFFF")
-        self.signup_password_entry.grid(row=1, column=1, padx=10, pady=10)
-        self.signup_password_entry.bind('<Return>', self.save_credentials)
+        layout.addWidget(QtWidgets.QLabel("Password:", self.signup_window))
+        self.signup_password_entry = QtWidgets.QLineEdit(self.signup_window)
+        self.signup_password_entry.setEchoMode(QtWidgets.QLineEdit.Password)
+        layout.addWidget(self.signup_password_entry)
 
-        signup_button = tk.Button(self.signup_window, text="Sign Up", command=self.save_credentials, bg="#0073E6", fg="#FFFFFF")
-        signup_button.grid(row=2, column=0, columnspan=2, pady=10)
-        signup_button.bind("<Enter>", lambda e: signup_button.config(bg="#005BB5"))
-        signup_button.bind("<Leave>", lambda e: signup_button.config(bg="#0073E6"))
+        signup_button = QtWidgets.QPushButton("Sign Up", self.signup_window)
+        signup_button.clicked.connect(self.save_credentials)
+        layout.addWidget(signup_button)
+
+        self.signup_window.setLayout(layout)
+        self.signup_window.exec_()
 
     def show_login_window(self):
-        self.login_window = tk.Toplevel(self.root)
-        self.login_window.title("Login")
-        self.login_window.configure(bg="#F5F5F5")  # Set background color
+        self.login_window = QtWidgets.QDialog(self)
+        self.login_window.setWindowTitle("Login")
+        self.login_window.setStyleSheet("background-color: #F5F5F5;")
+        layout = QtWidgets.QVBoxLayout()
 
-        tk.Label(self.login_window, text="Username:", bg="#F5F5F5", fg="#003366").grid(row=0, column=0, padx=10, pady=10)
-        self.login_username_entry = tk.Entry(self.login_window, bg="#FFFFFF")
-        self.login_username_entry.grid(row=0, column=1, padx=10, pady=10)
-        self.login_username_entry.bind('<Return>', lambda event: self.login_password_entry.focus_set())
+        layout.addWidget(QtWidgets.QLabel("Username:", self.login_window))
+        self.login_username_entry = QtWidgets.QLineEdit(self.login_window)
+        layout.addWidget(self.login_username_entry)
 
-        tk.Label(self.login_window, text="Password:", bg="#F5F5F5", fg="#003366").grid(row=1, column=0, padx=10, pady=10)
-        self.login_password_entry = tk.Entry(self.login_window, show='*', bg="#FFFFFF")
-        self.login_password_entry.grid(row=1, column=1, padx=10, pady=10)
-        self.login_password_entry.bind('<Return>', self.check_credentials)
+        layout.addWidget(QtWidgets.QLabel("Password:", self.login_window))
+        self.login_password_entry = QtWidgets.QLineEdit(self.login_window)
+        self.login_password_entry.setEchoMode(QtWidgets.QLineEdit.Password)
+        layout.addWidget(self.login_password_entry)
 
-        login_button = tk.Button(self.login_window, text="Login", command=self.check_credentials, bg="#0073E6", fg="#FFFFFF")
-        login_button.grid(row=2, column=0, columnspan=2, pady=10)
-        login_button.bind("<Enter>", lambda e: login_button.config(bg="#005BB5"))
-        login_button.bind("<Leave>", lambda e: login_button.config(bg="#0073E6"))
+        login_button = QtWidgets.QPushButton("Login", self.login_window)
+        login_button.clicked.connect(self.check_credentials)
+        layout.addWidget(login_button)
 
-    def save_credentials(self, event=None):
-        username = self.signup_username_entry.get()
-        password = self.signup_password_entry.get()
+        self.login_window.setLayout(layout)
+        self.login_window.exec_()
+
+    def save_credentials(self):
+        username = self.signup_username_entry.text()
+        password = self.signup_password_entry.text()
 
         if username and password:
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
             with open("credentials.txt", "w") as f:
-                f.write(f"{username}\n{password}")
-            messagebox.showinfo("Success", "Signup successful! Please log in.")
-            self.signup_window.destroy()
+                f.write(f"{username}\n{hashed_password}")
+            QtWidgets.QMessageBox.information(self, "Success", "Signup successful! Please log in.")
+            self.signup_window.close()
         else:
-            messagebox.showwarning("Input Error", "Please enter both username and password.")
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter both username and password.")
 
-    def check_credentials(self, event=None):
-        username = self.login_username_entry.get()
-        password = self.login_password_entry.get()
+    def check_credentials(self):
+        username = self.login_username_entry.text()
+        password = self.login_password_entry.text()
 
         if os.path.exists("credentials.txt"):
             with open("credentials.txt", "r") as f:
                 lines = f.readlines()
-                if len(lines) >= 2 and lines[0].strip() == username and lines[1].strip() == password:
+                if len(lines) >= 2 and lines[0].strip() == username and lines[1].strip() == hashlib.sha256(password.encode()).hexdigest():
                     self.username = username
                     self.password = password
-                    self.login_window.destroy()
-                    self.root.destroy()  # Close the auth window
+                    self.login_window.close()
+                    print("Login successful, launching main application...")  # Debugging line
                     self.launch_Main()
                 else:
-                    messagebox.showwarning("Login Error", "Invalid username or password.")
+                    QtWidgets.QMessageBox.warning(self, "Login Error", "Invalid username or password.")
         else:
-            messagebox.showwarning("Login Error", "No credentials found. Please sign up first.")
+            QtWidgets.QMessageBox.warning(self, "Login Error", "No credentials found. Please sign up first.")
 
     def launch_Main(self):
         import Main  # Import the main application code
-        Main.run(self.username)  # Pass the username to the main app
+        try:
+            print("Attempting to launch main application...")  # Debugging line
+            if not QtWidgets.QApplication.instance():
+                app = QtWidgets.QApplication(sys.argv)
+            else:
+                app = QtWidgets.QApplication.instance()
+            Main.run(self.username)  # Pass the username to the main app
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Failed to launch main application: {str(e)}")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = Auth(root)
-    root.mainloop()
+    app = QtWidgets.QApplication(sys.argv)
+    window = Auth()
+    window.show()
+    sys.exit(app.exec_())

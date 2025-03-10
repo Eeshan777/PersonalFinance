@@ -1,57 +1,69 @@
-import os
-import tkinter as tk
-from tkinter import messagebox
-import subprocess
-from BudgetReport import BudgetReport  # Ensure this matches the class name in Budget_Report.py
-from InterestCalculator import InterestCalculator
-from TransactionRecord import TransactionRecord
+import sys
+from PyQt5 import QtWidgets, QtGui
 
-class PersonalFinance:
-    def __init__(self, root, username):
-        self.root = root
-        self.root.title("Personal Finance")
+class PersonalFinance(QtWidgets.QWidget):
+    def __init__(self, username):
+        super().__init__()
+        self.setWindowTitle("Personal Finance")
         self.username = username
-
+        self.setStyleSheet("background-color: #F5F5F5;")
         self.show_welcome_message()
 
     def show_welcome_message(self):
-        welcome_label = tk.Label(self.root, text=f"Welcome, {self.username}!", font=("Helvetica", 24), bg="#F5F5F5", fg="#003366")
-        welcome_label.grid(row=0, column=0, columnspan=3, padx=10, pady=20)
+        layout = QtWidgets.QVBoxLayout()
+        welcome_label = QtWidgets.QLabel(f"Welcome, {self.username}!")
+        welcome_label.setFont(QtGui.QFont("Helvetica", 24))
+        welcome_label.setStyleSheet("color: #003366;")
+        layout.addWidget(welcome_label)
 
-        # Button to launch Interest Calculator
-        interest_calculator_button = tk.Button(self.root, text="Interest Calculator", command=self.launch_interest_calculator, width=30, bg="#0073E6", fg="#FFFFFF")
-        interest_calculator_button.grid(row=1, column=0, padx=10, pady=10)
-        interest_calculator_button.bind("<Enter>", lambda e: interest_calculator_button.config(bg="#005BB5"))
-        interest_calculator_button.bind("<Leave>", lambda e: interest_calculator_button.config(bg="#0073E6"))
+        # Add buttons and their connections here...
+        interest_calculator_button = QtWidgets.QPushButton("Interest Calculator")
+        interest_calculator_button.setStyleSheet("background-color: #0073E6; color: #FFFFFF;")
+        interest_calculator_button.clicked.connect(self.launch_interest_calculator)
+        layout.addWidget(interest_calculator_button)
 
-        # Button to launch Transaction Record
-        transaction_record_button = tk.Button(self.root, text="Transaction Record", command=self.launch_transaction_record, width=30, bg="#0073E6", fg="#FFFFFF")
-        transaction_record_button.grid(row=1, column=1, padx=10, pady=10)
-        transaction_record_button.bind("<Enter>", lambda e: transaction_record_button.config(bg="#005BB5"))
-        transaction_record_button.bind("<Leave>", lambda e: transaction_record_button.config(bg="#0073E6"))
+        transaction_record_button = QtWidgets.QPushButton("Transaction Record")
+        transaction_record_button.setStyleSheet("background-color: #0073E6; color: #FFFFFF;")
+        transaction_record_button.clicked.connect(self.launch_transaction_record)
+        layout.addWidget(transaction_record_button)
 
-        # Button to launch Budget Report
-        budget_report_button = tk.Button(self.root, text="Generate Budget Report", command=self.launch_budget_report, width=30, bg="#0073E6", fg="#FFFFFF")
-        budget_report_button.grid(row=1, column=2, padx=10, pady=10)
-        budget_report_button.bind("<Enter>", lambda e: budget_report_button.config(bg="#005BB5"))
-        budget_report_button.bind("<Leave>", lambda e: budget_report_button.config(bg="#0073E6"))
+        budget_report_button = QtWidgets.QPushButton("Generate Budget Report")
+        budget_report_button.setStyleSheet("background-color: #0073E6; color: #FFFFFF;")
+        budget_report_button.clicked.connect(self.launch_budget_report)
+        layout.addWidget(budget_report_button)
+
+        self.setLayout(layout)
 
     def launch_interest_calculator(self):
-        interest_calculator_window = tk.Toplevel(self.root)
-        InterestCalculator(interest_calculator_window)  # Create an instance of InterestCalculator
+        from InterestCalculator import InterestCalculator
+        interest_calculator_window = QtWidgets.QDialog(self)
+        interest_calculator = InterestCalculator(interest_calculator_window)
+        interest_calculator_window.exec_()  # Show the dialog
 
     def launch_transaction_record(self):
-        transaction_record_window = tk.Toplevel(self.root)
-        TransactionRecord(transaction_record_window)  # Create an instance of TransactionRecord
+        from TransactionRecord import TransactionRecord
+        transaction_record_window = QtWidgets.QDialog(self)
+        transaction_record = TransactionRecord(transaction_record_window)
+        transaction_record_window.exec_()  # Show the dialog
 
     def launch_budget_report(self):
-        budget_report_window = tk.Toplevel(self.root)
-        BudgetReport(budget_report_window)  # Create an instance of BudgetReport
+        from BudgetReport import BudgetReport
+        budget_report_window = QtWidgets.QDialog(self)
+        budget_report = BudgetReport(budget_report_window)
+        budget_report_window.exec_()  # Show the dialog
 
 def run(username):
-    root = tk.Tk()
-    app = PersonalFinance(root, username)
-    root.mainloop()
+    print("Running main application...")  # Debugging line
+    try:
+        app = QtWidgets.QApplication.instance()
+        if not app:
+            app = QtWidgets.QApplication(sys.argv)
+        window = PersonalFinance(username)
+        window.show()
+        sys.exit(app.exec_())
+    except Exception as e:
+        QtWidgets.QMessageBox.critical(None, "Error", f"An error occurred: {str(e)}")
 
 if __name__ == "__main__":
+    print("Main module executed directly.")  # Debugging line
     pass
