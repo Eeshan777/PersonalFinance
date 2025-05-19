@@ -32,7 +32,7 @@ def load_session():
         return None
 
 def login_ui(page: ft.Page):
-    page.title = "Personally Finance - Login"
+    page.title = "Personal Finance - Login"
     page.bgcolor = "#E3F2FD"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     
