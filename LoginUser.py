@@ -20,9 +20,10 @@ def validate_credentials(username, password):
         user = cursor.fetchone()
     return user is not None
 
-def save_session(username):
+def save_session(username, password):
     with open("credentials.txt", "w") as f:
-        f.write(username)  # Only save the username
+        f.write(username)
+        f.write(password)
 
 def load_session():
     try:
@@ -45,7 +46,7 @@ def login_ui(page: ft.Page):
         password = password_field.value.strip()
         
         if validate_credentials(username, password):
-            save_session(username)
+            save_session(username, password)
             page.clean()  # Clear the page
             from Main import main_page
             main_page(page)  # Call the main page function
