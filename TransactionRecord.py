@@ -12,11 +12,10 @@ class TransactionRecord:
         self.view.title = "Transaction Record"
         self.view.bgcolor = "#E3F2FD"
 
-        # DatePicker setup
         self.date_picker = ft.DatePicker(
             on_change=self.date_selected,
             first_date=datetime.date(2000, 1, 1),
-            last_date=datetime.date(2025, 12, 31),
+            last_date=datetime.date(2125, 12, 31),
         )
         self.page.overlay.append(self.date_picker)
 
@@ -29,7 +28,7 @@ class TransactionRecord:
             read_only=True,
             dense=True,
             suffix=ft.IconButton(
-                icon=ft.icons.CALENDAR_MONTH,
+                icon="calendar_month",
                 on_click=lambda e: self.open_date_picker()
             ),
             on_submit=lambda e: self.type_dropdown.focus()
@@ -87,7 +86,7 @@ class TransactionRecord:
         self.table = self.create_data_table()
 
         self.header = ft.Row([
-            ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_back),
+            ft.IconButton(icon="arrow_back", on_click=self.go_back),
             ft.Container(
                 content=ft.Text("Transaction Record", size=24, weight=ft.FontWeight.BOLD, color="#0D47A1"),
                 alignment=ft.alignment.center,
@@ -173,7 +172,7 @@ class TransactionRecord:
         self.balance += amount_val if entry_type == "Income" else -amount_val
 
         delete_icon = ft.IconButton(
-            icon=ft.icons.DELETE,
+            icon="delete",
             on_click=lambda e, r=(date_val, particular, amount_val, entry_type, classification): self.delete_entry(r)
         )
 

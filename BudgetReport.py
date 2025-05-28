@@ -20,7 +20,7 @@ class BudgetReport:
             read_only=True,
             text_align=ft.TextAlign.CENTER,
             dense=True,
-            suffix=ft.IconButton(icon=ft.icons.CALENDAR_MONTH, on_click=lambda e: self.date_picker.pick_date()),
+            suffix=ft.IconButton(icon="calendar_month", on_click=lambda e: self.date_picker.pick_date()),
             on_submit=lambda e: self.report_type_dropdown.focus()
         )
 
@@ -35,7 +35,6 @@ class BudgetReport:
         self.generate_button = ft.ElevatedButton(
             "Generate Report",
             width=field_width,
-            height=48,
             bgcolor="#1565C0",
             color="white",
             style=ft.ButtonStyle(
@@ -50,16 +49,15 @@ class BudgetReport:
             bgcolor="white",
             padding=15,
             border_radius=15,
-            height=360,
-            width=420,
+            height=240,
+            width=780,
             border=ft.border.all(1, "#90CAF9"),
             content=ft.Text("", size=14),
             alignment=ft.alignment.top_left
         )
 
-        # Header
         self.header = ft.Row([
-            ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_back),
+            ft.IconButton(icon="arrow_back", on_click=self.go_back),
             ft.Container(
                 content=ft.Text("Budget Report", size=24, weight=ft.FontWeight.BOLD, color="#0D47A1"),
                 expand=True,
@@ -67,21 +65,23 @@ class BudgetReport:
             )
         ], alignment=ft.MainAxisAlignment.START, spacing=5)
 
-        # Left Form
         self.form_column = ft.Column([
             self.date_field,
             self.report_type_dropdown,
             self.generate_button
         ], spacing=15)
 
-        # Layout
         self.main_layout = ft.Column([
             self.header,
-            ft.Row([
-                ft.Container(content=self.form_column, width=420),
-                self.report_display
-            ], alignment=ft.MainAxisAlignment.CENTER, spacing=20)
-        ], scroll=ft.ScrollMode.AUTO, expand=True, spacing=20)
+            ft.Column(
+                [
+                    self.form_column,
+                    self.report_display
+                ],
+               spacing=15,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+        ], spacing=15, scroll=ft.ScrollMode.AUTO, expand=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         self.view.controls.clear()
         self.view.controls.append(self.main_layout)

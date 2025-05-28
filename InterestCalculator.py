@@ -29,7 +29,7 @@ class InterestCalculator:
             read_only=True,
             text_align=ft.TextAlign.CENTER,
             dense=True,
-            suffix=ft.IconButton(icon=ft.icons.CALENDAR_MONTH, on_click=lambda e: self.date_picker.pick_date()),
+            suffix=ft.IconButton(icon="calendar_month", on_click=lambda e: self.date_picker.pick_date()),
             on_submit=lambda e: self.amount_field.focus()
         )
 
@@ -72,9 +72,8 @@ class InterestCalculator:
         self.table = self.create_data_table()
         self.create_table_in_db()
 
-        # Header
         self.header = ft.Row([
-            ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_back),
+            ft.IconButton(icon="arrow_back", on_click=self.go_back),
             ft.Container(
                 content=ft.Text("Interest Calculator", size=24, weight=ft.FontWeight.BOLD, color="#0D47A1"),
                 alignment=ft.alignment.center,
@@ -82,7 +81,6 @@ class InterestCalculator:
             )
         ], alignment=ft.MainAxisAlignment.START, spacing=5)
 
-        # Left (Form) and Right (Display)
         self.form_column = ft.Column([
             self.deposit_type_dropdown,
             self.date_field,
@@ -90,25 +88,26 @@ class InterestCalculator:
             self.rate_field,
             self.time_dropdown,
             ft.Row([self.add_button, self.save_button], alignment=ft.MainAxisAlignment.CENTER, spacing=15)
-        ], spacing=15)
+        ], spacing=15, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         self.display_panel = ft.Container(
             bgcolor="white",
             padding=15,
             border_radius=15,
-            height=360,
-            width=420,
+            height=240,
+            width=780,
             border=ft.border.all(1, "#90CAF9"),
             content=ft.Column([self.table], expand=True, scroll=ft.ScrollMode.AUTO)
         )
 
         self.main_layout = ft.Column([
             self.header,
-            ft.Row([
-                ft.Container(content=self.form_column, width=420),
-                self.display_panel
-            ], alignment=ft.MainAxisAlignment.CENTER, spacing=20)
-        ], scroll=ft.ScrollMode.AUTO, expand=True, spacing=20)
+            self.form_column,
+            self.display_panel
+        ], spacing=15,
+           scroll=ft.ScrollMode.AUTO,
+           expand=True,
+           horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         self.view.controls.clear()
         self.view.controls.append(self.main_layout)
@@ -180,7 +179,7 @@ class InterestCalculator:
             }
 
             delete_icon = ft.IconButton(
-                icon=ft.icons.DELETE,
+                icon="delete",
                 on_click=lambda e, r=row_data: self.delete_entry(r)
             )
 

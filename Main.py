@@ -1,5 +1,4 @@
 import flet as ft
-import sqlite3
 from LoginUser import login_ui
 
 def main_page(page: ft.Page):

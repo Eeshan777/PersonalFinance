@@ -1,3 +1,4 @@
+### LoginUser.py
 import flet as ft
 import sqlite3
 import hashlib
@@ -13,17 +14,16 @@ def initialize_database():
         conn.commit()
 
 def validate_credentials(username, password):
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()  # Hash the password
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM users WHERE username=? AND password=?", (username, hashed_password))
         user = cursor.fetchone()
     return user is not None
 
-def save_session(username, password):
+def save_session(username):
     with open("credentials.txt", "w") as f:
         f.write(username)
-        f.write(password)
 
 def load_session():
     try:
@@ -33,43 +33,48 @@ def load_session():
         return None
 
 def login_ui(page: ft.Page):
+    page.clean()
     page.title = "Personal Finance - Login"
     page.bgcolor = "#E3F2FD"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    
+
     username_field = ft.TextField(label="Username", width=350, bgcolor="#FFFFFF", border_radius=8, color="black")
     password_field = ft.TextField(label="Password", width=350, password=True, bgcolor="#FFFFFF", border_radius=8, color="black")
     message_text = ft.Text("", color="red")
-    
+
     def handle_login(e):
         username = username_field.value.strip()
         password = password_field.value.strip()
-        
+
         if validate_credentials(username, password):
-            save_session(username, password)
-            page.clean()  # Clear the page
+            save_session(username)
+            page.clean()
             from Main import main_page
-            main_page(page)  # Call the main page function
+            main_page(page)
         else:
             message_text.value = "Invalid credentials. Try again."
             page.update()
-        
+
     def handle_enter(e):
         if e.control == username_field:
             password_field.focus()
         elif e.control == password_field and username_field.value.strip():
             handle_login(None)
         page.update()
-    
+
     username_field.on_submit = handle_enter
     password_field.on_submit = handle_enter
-    
+
     login_button = ft.ElevatedButton("Login", on_click=handle_login, bgcolor="#1565C0", style=ft.ButtonStyle(color="white"), width=350)
-    signup_button = ft.TextButton("Create an account", on_click=lambda e: signup_ui(page), style=ft.ButtonStyle(color="#1565C0"))
-    
+    signup_button = ft.TextButton(
+        "Create an account",
+        on_click=lambda e: (page.clean(), signup_ui(page)),
+        style=ft.ButtonStyle(color="#1565C0")
+    )
+
     page.add(
         ft.Container(
-            content=ft.Column([ 
+            content=ft.Column([
                 ft.Text("Personal Finance", size=30, weight=ft.FontWeight.BOLD, color="#0D47A1"),
                 username_field,
                 password_field,
@@ -88,14 +93,15 @@ def login_ui(page: ft.Page):
 def signup_ui(page: ft.Page):
     page.clean()
     page.title = "Personal Finance - Signup"
-    
+
     username_field = ft.TextField(label="Username", width=350, bgcolor="#FFFFFF", border_radius=8, color="black")
     password_field = ft.TextField(label="Password", width=350, password=True, bgcolor="#FFFFFF", border_radius=8, color="black")
     message_text = ft.Text("", color="red")
-    
+
     def handle_signup(e):
         username = username_field.value.strip()
         password = password_field.value.strip()
+
         if len(password) < 6:
             message_text.value = "Password must be at least 6 characters."
         elif check_username_exists(username):
@@ -107,26 +113,29 @@ def signup_ui(page: ft.Page):
                     cursor = conn.cursor()
                     cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
                     conn.commit()
-                message_text.value = "Signup successful! Please login."
-                page.update()
-                login_ui(page)  # Go back to login UI
+                page.clean()
+                login_ui(page)
             except sqlite3.Error as e:
                 message_text.value = f"Database error: {e}"
                 page.update()
-        
+
     def handle_enter(e):
         if e.control == username_field:
             password_field.focus()
         elif e.control == password_field and username_field.value.strip():
             handle_signup(None)
         page.update()
-    
+
     username_field.on_submit = handle_enter
     password_field.on_submit = handle_enter
-    
+
     signup_button = ft.ElevatedButton("Signup", on_click=handle_signup, bgcolor="#2E7D32", style=ft.ButtonStyle(color="white"), width=350)
-    login_button = ft.TextButton("Already have an account? Login", on_click=lambda e: login_ui(page), style=ft.ButtonStyle(color="#1565C0"))
-    
+    login_button = ft.TextButton(
+        "Already have an account? Login",
+        on_click=lambda e: (page.clean(), login_ui(page)),
+        style=ft.ButtonStyle(color="#1565C0")
+    )
+
     page.add(
         ft.Container(
             content=ft.Column([
