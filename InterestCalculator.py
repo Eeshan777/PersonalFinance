@@ -6,6 +6,11 @@ class InterestCalculator:
     def __init__(self, page, view: ft.View):
         self.page = page
         self.view = view
+        self.page.window_maximized = True
+        self.page.window_full_screen = True
+        self.page.scroll = ft.ScrollMode.AUTO
+        self.page.update()
+
         self.entries = []
         self.view.title = "Interest Calculator"
         self.view.bgcolor = "#E3F2FD"
@@ -94,8 +99,8 @@ class InterestCalculator:
             bgcolor="white",
             padding=15,
             border_radius=15,
-            height=240,
-            width=780,
+            height=300,
+            width=850,
             border=ft.border.all(1, "#90CAF9"),
             content=ft.Column([self.table], expand=True, scroll=ft.ScrollMode.AUTO)
         )

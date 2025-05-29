@@ -8,6 +8,11 @@ class DownloadPDF:
     def __init__(self, page, view: ft.View):
         self.page = page
         self.view = view
+        self.page.window_maximized = True
+        self.page.window_full_screen = True
+        self.page.scroll = ft.ScrollMode.AUTO
+        self.page.update()
+
         self.view.title = "Download PDF"
         self.view.bgcolor = "#E3F2FD"
 
@@ -72,19 +77,14 @@ class DownloadPDF:
             self.date_field,
             self.report_type_dropdown,
             self.generate_button
-        ], spacing=15)
+        ], spacing=15, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         self.main_layout = ft.Column([
             self.header,
-            ft.Column(
-                [
-                    self.form_column,
-                    self.pdf_message
-                ],
-                spacing=15,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-        ], spacing=15, scroll=ft.ScrollMode.AUTO, expand=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+            self.form_column,
+            self.pdf_message
+        ], spacing=15, scroll=ft.ScrollMode.AUTO, expand=True,
+           horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         self.view.controls.clear()
         self.view.controls.append(self.main_layout)

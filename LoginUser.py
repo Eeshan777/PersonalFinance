@@ -1,4 +1,3 @@
-### LoginUser.py
 import flet as ft
 import sqlite3
 import hashlib
@@ -33,6 +32,10 @@ def load_session():
         return None
 
 def login_ui(page: ft.Page):
+    page.window_maximized = True
+    page.window_full_screen = True
+    page.scroll = ft.ScrollMode.AUTO
+    page.update()
     page.clean()
     page.title = "Personal Finance - Login"
     page.bgcolor = "#E3F2FD"
@@ -91,6 +94,10 @@ def login_ui(page: ft.Page):
     )
 
 def signup_ui(page: ft.Page):
+    page.window_maximized = True
+    page.window_full_screen = True
+    page.scroll = ft.ScrollMode.AUTO
+    page.update()
     page.clean()
     page.title = "Personal Finance - Signup"
 

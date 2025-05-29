@@ -2,6 +2,11 @@ import flet as ft
 from LoginUser import login_ui
 
 def main_page(page: ft.Page):
+    page.window_maximized = True
+    page.window_full_screen = True
+    page.scroll = ft.ScrollMode.AUTO
+    page.update()
+
     username = load_session()
     if username:
         page.clean()

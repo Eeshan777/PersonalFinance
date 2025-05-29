@@ -6,6 +6,11 @@ class TransactionRecord:
     def __init__(self, page, view: ft.View):
         self.page = page
         self.view = view
+        self.page.window_maximized = True
+        self.page.window_full_screen = True
+        self.page.scroll = ft.ScrollMode.AUTO
+        self.page.update()
+
         self.entries = []
         self.balance = 0
 
@@ -15,7 +20,7 @@ class TransactionRecord:
         self.date_picker = ft.DatePicker(
             on_change=self.date_selected,
             first_date=datetime.date(2000, 1, 1),
-            last_date=datetime.date(2125, 12, 31),
+            last_date=datetime.date(2025, 12, 31),
         )
         self.page.overlay.append(self.date_picker)
 
@@ -111,8 +116,8 @@ class TransactionRecord:
                     bgcolor="white",
                     padding=15,
                     border_radius=15,
-                    height=240,
-                    width=780,
+                    height=300,
+                    width=850,
                     border=ft.border.all(1, "#90CAF9"),
                     content=ft.Column([self.table], expand=True, scroll=ft.ScrollMode.AUTO)
                 )
