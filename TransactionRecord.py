@@ -192,12 +192,13 @@ class TransactionRecord:
         ]))
 
         self.entries.append({
-            "date": date_val,
+            "date": datetime.datetime.strptime(date_val, "%d/%m/%Y").strftime("%Y-%m-%d"),
             "particular": particular,
             "amount": amount_val,
             "type": entry_type,
             "classification": classification
         })
+
 
         self.clear_inputs()
         self.page.update()

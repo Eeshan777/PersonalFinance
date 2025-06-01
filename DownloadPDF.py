@@ -36,7 +36,7 @@ class DownloadPDF:
                 icon="calendar_month",
                 on_click=lambda e: self.open_date_picker()
             ),
-            on_submit=lambda e: self.type_dropdown.focus()
+            on_submit=lambda e: self.report_type_dropdown.focus()
         )
 
         self.report_type_dropdown = ft.Dropdown(
@@ -110,14 +110,16 @@ class DownloadPDF:
         if self.date_picker.value:
             picked = self.date_picker.value
             self.date_field.value = picked.strftime("%d/%m/%Y")
-            self.type_dropdown.focus()
+            self.report_type_dropdown.focus()
             self.page.update()
 
     def generate_pdf(self, e):
         report_type = self.report_type_dropdown.value
-        month_year = self.date_field.value
+        date_val = datetime.datetime.strptime(self.date_field.value, "%d/%m/%Y")
+        month = date_val.strftime("%m")
+        year = date_val.strftime("%Y")
 
-        if not report_type or not month_year:
+        if not report_type or not self.date_field.value:
             self.show_snack_bar("Please select report type and date.", "red")
             return
 
@@ -132,7 +134,7 @@ class DownloadPDF:
             if report_type == "Interest Calculator":
                 headers = ["Deposit Date", "Maturity Date", "Deposit Type", "Amount", "Interest Rate", "Time", "Maturity"]
                 data = [headers]
-                cursor.execute("SELECT * FROM interest_calculations WHERE strftime('%m/%Y', deposit_date) = ?", (month_year,))
+                cursor.execute("SELECT * FROM interest_calculations WHERE strftime('%m', deposit_date) = ? AND strftime('%Y', deposit_date) = ?", (month, year))
                 entries = cursor.fetchall()
                 for row in entries:
                     data.append([row[1], row[2], row[7], row[3], row[4], row[5], row[6]])
@@ -140,7 +142,7 @@ class DownloadPDF:
             elif report_type == "Transaction Record":
                 headers = ["Date", "Particular", "Amount", "Type", "Classification"]
                 data = [headers]
-                cursor.execute("SELECT * FROM transactions WHERE strftime('%m/%Y', date) = ?", (month_year,))
+                cursor.execute("SELECT * FROM transactions WHERE strftime('%m', date) = ? AND strftime('%Y', date) = ?", (month, year))
                 entries = cursor.fetchall()
                 for row in entries:
                     data.append([row[1], row[2], row[3], row[4], row[5]])

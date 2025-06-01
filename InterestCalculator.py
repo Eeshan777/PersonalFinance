@@ -186,14 +186,15 @@ class InterestCalculator:
             maturity_amount = self.calculate_maturity(amount, rate, years, deposit_type == "Cumulative")
 
             row_data = {
-                "deposit_date": deposit_date_str,
-                "maturity_date": maturity_date.strftime("%d/%m/%Y"),
+                "deposit_date": deposit_date.strftime("%Y-%m-%d"),
+                "maturity_date": maturity_date.strftime("%d/%m/%Y"),  # Keep as is for display
                 "amount": amount,
                 "rate": rate,
                 "time": f"{years} year(s)",
                 "maturity_amount": maturity_amount,
                 "type": deposit_type
             }
+
 
             delete_icon = ft.IconButton(
                 icon="delete",

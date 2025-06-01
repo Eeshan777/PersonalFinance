@@ -33,7 +33,7 @@ class BudgetReport:
                 icon="calendar_month",
                 on_click=lambda e: self.open_date_picker()
             ),
-            on_submit=lambda e: self.type_dropdown.focus()
+            on_submit=lambda e: self.report_type_dropdown.focus()
         )
 
         self.report_type_dropdown = ft.Dropdown(
@@ -107,7 +107,7 @@ class BudgetReport:
         if self.date_picker.value:
             picked = self.date_picker.value
             self.date_field.value = picked.strftime("%d/%m/%Y")
-            self.type_dropdown.focus()
+            self.report_type_dropdown.focus()
             self.page.update()
 
     def fetch_data(self, selected_date, report_type):
@@ -116,8 +116,9 @@ class BudgetReport:
             cursor = conn.cursor()
 
             if report_type == "Monthly":
-                key = selected_date.strftime("%m/%Y")
-                cursor.execute("SELECT * FROM transactions WHERE strftime('%m/%Y', date) = ?", (key,))
+                key = selected_date.strftime("%m")
+                year = selected_date.strftime("%Y")
+                cursor.execute("SELECT * FROM transactions WHERE strftime('%m', date) = ? AND strftime('%Y', date) = ?", (key, year))
                 transactions = cursor.fetchall()
                 cursor.execute("SELECT * FROM interest_calculations WHERE strftime('%Y', deposit_date) = ?", (selected_date.strftime("%Y"),))
                 interest = cursor.fetchall()
