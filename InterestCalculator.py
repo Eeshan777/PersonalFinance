@@ -1,6 +1,6 @@
 import flet as ft
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 class InterestCalculator:
     def __init__(self, page, view: ft.View):
@@ -15,7 +15,11 @@ class InterestCalculator:
         self.view.title = "Interest Calculator"
         self.view.bgcolor = "#E3F2FD"
 
-        self.date_picker = ft.DatePicker(on_change=self.update_date)
+        self.date_picker = ft.DatePicker(
+            on_change=self.date_selected,
+            first_date=date(2000, 1, 1),
+            last_date=date(2025, 12, 31),
+        )
         self.page.overlay.append(self.date_picker)
 
         field_width = 360
@@ -29,13 +33,16 @@ class InterestCalculator:
         )
 
         self.date_field = ft.TextField(
-            label="Deposit Date",
+            label="Enter Date (DD/MM/YYYY)",
             width=field_width,
-            read_only=True,
             text_align=ft.TextAlign.CENTER,
+            read_only=True,
             dense=True,
-            suffix=ft.IconButton(icon="calendar_month", on_click=lambda e: self.date_picker.pick_date()),
-            on_submit=lambda e: self.amount_field.focus()
+            suffix=ft.IconButton(
+                icon="calendar_month",
+                on_click=lambda e: self.open_date_picker()
+            ),
+            on_submit=lambda e: self.type_dropdown.focus()
         )
 
         self.amount_field = ft.TextField(
@@ -117,15 +124,20 @@ class InterestCalculator:
         self.view.controls.clear()
         self.view.controls.append(self.main_layout)
 
+    def open_date_picker(self):
+        self.date_picker.open = True
+        self.page.update()
+
+    def date_selected(self, e):
+        if self.date_picker.value:
+            picked = self.date_picker.value
+            self.date_field.value = picked.strftime("%d/%m/%Y")
+            self.type_dropdown.focus()
+            self.page.update()
+
     def go_back(self, e):
         if len(self.page.views) > 1:
             self.page.views.pop()
-            self.page.update()
-
-    def update_date(self, e):
-        if self.date_picker.value:
-            self.date_field.value = self.date_picker.value.strftime("%d/%m/%Y")
-            self.amount_field.focus()
             self.page.update()
 
     def create_table_in_db(self):

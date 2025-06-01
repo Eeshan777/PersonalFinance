@@ -16,17 +16,24 @@ class BudgetReport:
 
         field_width = 360
 
-        self.date_picker = ft.DatePicker(on_change=self.update_date_field)
+        self.date_picker = ft.DatePicker(
+            on_change=self.date_selected,
+            first_date=datetime.date(2000, 1, 1),
+            last_date=datetime.date(2025, 12, 31),
+        )
         self.page.overlay.append(self.date_picker)
 
         self.date_field = ft.TextField(
-            label="Select Date",
+            label="Enter Date (DD/MM/YYYY)",
             width=field_width,
-            read_only=True,
             text_align=ft.TextAlign.CENTER,
+            read_only=True,
             dense=True,
-            suffix=ft.IconButton(icon="calendar_month", on_click=lambda e: self.date_picker.pick_date()),
-            on_submit=lambda e: self.report_type_dropdown.focus()
+            suffix=ft.IconButton(
+                icon="calendar_month",
+                on_click=lambda e: self.open_date_picker()
+            ),
+            on_submit=lambda e: self.type_dropdown.focus()
         )
 
         self.report_type_dropdown = ft.Dropdown(
@@ -92,10 +99,15 @@ class BudgetReport:
             self.page.views.pop()
             self.page.update()
 
-    def update_date_field(self, e):
+    def open_date_picker(self):
+        self.date_picker.open = True
+        self.page.update()
+
+    def date_selected(self, e):
         if self.date_picker.value:
-            self.date_field.value = self.date_picker.value.strftime("%d/%m/%Y")
-            self.report_type_dropdown.focus()
+            picked = self.date_picker.value
+            self.date_field.value = picked.strftime("%d/%m/%Y")
+            self.type_dropdown.focus()
             self.page.update()
 
     def fetch_data(self, selected_date, report_type):
