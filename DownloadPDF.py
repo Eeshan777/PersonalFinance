@@ -5,6 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
 import datetime
 
+
 class DownloadPDF:
     def __init__(self, page, view: ft.View):
         self.page = page
@@ -19,6 +20,7 @@ class DownloadPDF:
 
         field_width = 360
 
+        # Date Picker
         self.date_picker = ft.DatePicker(
             on_change=self.date_selected,
             first_date=datetime.date(2000, 1, 1),
@@ -39,6 +41,7 @@ class DownloadPDF:
             on_submit=lambda e: self.report_type_dropdown.focus()
         )
 
+        # Dropdown
         self.report_type_dropdown = ft.Dropdown(
             label="Report Type",
             width=field_width,
@@ -50,28 +53,21 @@ class DownloadPDF:
             on_change=lambda e: self.generate_button.focus()
         )
 
+        # File Picker
+        self.file_picker = ft.FilePicker(on_result=self.save_path_selected)
+        self.page.overlay.append(self.file_picker)
+
+        # Button
         self.generate_button = ft.ElevatedButton(
             "Generate PDF",
             width=field_width,
             bgcolor="#1565C0",
             color="white",
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=10)
-            ),
-            on_click=self.generate_pdf
+            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)),
+            on_click=self.request_file_save_location
         )
 
-        self.pdf_message = ft.Container(
-            bgcolor="white",
-            padding=15,
-            border_radius=15,
-            height=240,
-            width=780,
-            border=ft.border.all(1, "#90CAF9"),
-            content=ft.Text("PDF will be saved to the app directory.", size=14),
-            alignment=ft.alignment.top_left
-        )
-
+        # Header and layout
         self.header = ft.Row([
             ft.IconButton(icon="arrow_back", on_click=self.go_back),
             ft.Container(
@@ -89,8 +85,7 @@ class DownloadPDF:
 
         self.main_layout = ft.Column([
             self.header,
-            self.form_column,
-            self.pdf_message
+            self.form_column
         ], spacing=15, scroll=ft.ScrollMode.AUTO, expand=True,
            horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
@@ -113,18 +108,28 @@ class DownloadPDF:
             self.report_type_dropdown.focus()
             self.page.update()
 
-    def generate_pdf(self, e):
+    def request_file_save_location(self, e):
+        # Check fields first
+        if not self.date_field.value or not self.report_type_dropdown.value:
+            self.show_snack_bar("Please select report type and date.", "red")
+            return
+
+        default_name = self.report_type_dropdown.value.lower().replace(" ", "_") + "_report.pdf"
+        self.file_picker.save_file(dialog_title="Save PDF As", file_name=default_name)
+
+    def save_path_selected(self, e: ft.FilePickerResultEvent):
+        if not e.path:
+            self.show_snack_bar("PDF save cancelled.", "red")
+            return
+        self.generate_pdf_file(e.path)
+
+    def generate_pdf_file(self, file_path):
         report_type = self.report_type_dropdown.value
         date_val = datetime.datetime.strptime(self.date_field.value, "%d/%m/%Y")
         month = date_val.strftime("%m")
         year = date_val.strftime("%Y")
 
-        if not report_type or not self.date_field.value:
-            self.show_snack_bar("Please select report type and date.", "red")
-            return
-
-        filename = f"{report_type.lower().replace(' ', '_')}_report.pdf"
-        pdf = SimpleDocTemplate(filename, pagesize=letter)
+        pdf = SimpleDocTemplate(file_path, pagesize=letter)
         elements = []
 
         try:
@@ -162,7 +167,7 @@ class DownloadPDF:
             elements.append(table)
             pdf.build(elements)
 
-            self.show_snack_bar(f"PDF '{filename}' generated successfully.", "green")
+            self.show_snack_bar(f"PDF saved to: {file_path}", "green")
 
         except Exception as ex:
             self.show_snack_bar(f"Error: {str(ex)}", "red")
