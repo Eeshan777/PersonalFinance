@@ -1,6 +1,13 @@
 import flet as ft
 import sqlite3
 import hashlib
+import ctypes
+import os
+import sys
+
+if sys.platform == "win32":
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("com.yourname.personalfinance.1.0")
+
 
 def initialize_database():
     with sqlite3.connect("database.db") as conn:
@@ -12,6 +19,7 @@ def initialize_database():
         )''')
         conn.commit()
 
+
 def validate_credentials(username, password):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     with sqlite3.connect("database.db") as conn:
@@ -20,9 +28,11 @@ def validate_credentials(username, password):
         user = cursor.fetchone()
     return user is not None
 
+
 def save_session(username):
     with open("credentials.txt", "w") as f:
         f.write(username)
+
 
 def load_session():
     try:
@@ -30,6 +40,7 @@ def load_session():
             return f.read().strip()
     except FileNotFoundError:
         return None
+
 
 def login_ui(page: ft.Page):
     page.window_maximized = True
@@ -92,6 +103,7 @@ def login_ui(page: ft.Page):
             shadow=ft.BoxShadow(blur_radius=15, color="#B0BEC5")
         )
     )
+
 
 def signup_ui(page: ft.Page):
     page.window_maximized = True
@@ -161,12 +173,14 @@ def signup_ui(page: ft.Page):
         )
     )
 
+
 def check_username_exists(username):
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM users WHERE username=?", (username,))
         user = cursor.fetchone()
     return user is not None
+
 
 if __name__ == "__main__":
     initialize_database()
