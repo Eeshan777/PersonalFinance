@@ -1,5 +1,6 @@
 import flet as ft
 import sqlite3
+from Main import get_db_path
 import datetime
 
 class TransactionRecord:
@@ -224,7 +225,7 @@ class TransactionRecord:
             return
 
         try:
-            conn = sqlite3.connect("database.db")
+            conn = sqlite3.connect(get_db_path())
             cursor = conn.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS transactions (
@@ -250,7 +251,7 @@ class TransactionRecord:
 
     def load_balance(self):
         try:
-            conn = sqlite3.connect("database.db")
+            conn = sqlite3.connect(get_db_path())
             cursor = conn.cursor()
             cursor.execute('''
                 SELECT SUM(CASE WHEN type='Income' THEN amount ELSE 0 END) -

@@ -1,5 +1,6 @@
 import flet as ft
 import sqlite3
+from Main import get_db_path
 import datetime
 
 class BudgetReport:
@@ -112,7 +113,7 @@ class BudgetReport:
 
     def fetch_data(self, selected_date, report_type):
         try:
-            conn = sqlite3.connect("database.db")
+            conn = sqlite3.connect(get_db_path())
             cursor = conn.cursor()
 
             if report_type == "Monthly":

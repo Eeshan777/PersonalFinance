@@ -1,5 +1,6 @@
 import flet as ft
 import sqlite3
+from Main import get_db_path
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
@@ -133,7 +134,7 @@ class DownloadPDF:
         elements = []
 
         try:
-            conn = sqlite3.connect("database.db")
+            conn = sqlite3.connect(get_db_path())
             cursor = conn.cursor()
 
             if report_type == "Interest Calculator":

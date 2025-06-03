@@ -1,5 +1,6 @@
 import flet as ft
 import sqlite3
+from Main import get_db_path
 from datetime import date, datetime, timedelta
 
 class InterestCalculator:
@@ -141,7 +142,7 @@ class InterestCalculator:
             self.page.update()
 
     def create_table_in_db(self):
-        conn = sqlite3.connect("database.db")
+        conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS interest_calculations (
@@ -240,7 +241,7 @@ class InterestCalculator:
             return
 
         try:
-            conn = sqlite3.connect("database.db")
+            conn = sqlite3.connect(get_db_path())
             cursor = conn.cursor()
             for entry in self.entries:
                 cursor.execute('''
